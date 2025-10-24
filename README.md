@@ -1,4 +1,4 @@
-# CTMS-with-c-
+# CTMS-with-cpp
 The Complete Train Management System (CTMS) is a software solution designed to automate key railway operations such as train scheduling, ticket booking, route management, and passenger services. 
 
 ----------------------Project proposal------------------------------
