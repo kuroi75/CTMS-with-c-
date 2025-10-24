@@ -2,7 +2,7 @@
 The Complete Train Management System (CTMS) is a software solution designed to automate key railway operations such as train scheduling, ticket booking, route management, and passenger services. 
 
 ----------------------Project proposal------------------------------
-Introduction:
+# Introduction:
 The Complete Train Management System (CTMS) is a software solution designed to automate key railway operations such as train scheduling, ticket booking, route management, and passenger services. It make easier job for both user and admin workflows, ensuring efficient, error-free, and accessible train service management. Built with  simple eye catching  design and practical coding principles, this project showcases real-world application of object-oriented programming and system logic. from booking tickets and checking train availability to managing routes and keeping everything running smoothly.
 Objectives:
 •	To provide a complete system for managing train operations including scheduling, ticket          booking, and route handling.
@@ -12,14 +12,14 @@ Objectives:
 •	To apply object-oriented programming concepts like classes and modular design for clean and maintainable code.
 •	To give user access to a user friendly all in one app for reducing time and money. 
 
-Target customers: 
+# Target customers: 
 •	Railway Authorities and Administrators 
 •	 passengers and Daily Commuters 
 •	 Ticketing Agents and Booking Office 
 •	Transport Planners and Analysts 
 •	 Educational Institutions
 •	 Developers and Tech Startups
-Application features and Description:
+# Application features and Description:
 Our goal is to make a complete train management system  (CTMS) for both user and the administrators of railway .
 Here are the features of our application
 •	Login: Administrators can securely log in to the system using their credentials. Can added , delete or modify train ticket and route and schedules. 
@@ -29,7 +29,7 @@ Here are the features of our application
 •	Train Delays: The system provides real-time updates on train delays, allowing administrators to manage and communicate delays effectively.
 •	Train Cancellations: Users are informed about train cancellations promptly, enabling them to make alternate travel arrangements.
 •	Ticket Reservation: Passengers can reserve tickets for their desired train and route, cancel and refund their ticket fare anytime in automated billing system. 
-Tools and resources:
+# Tools and resources:
 • 	C++ programming language for logic and object-oriented design.
 • 	GCC / MinGW compiler to build and run the code.
 • 	Visual Studio / VS Code as the development environment.
