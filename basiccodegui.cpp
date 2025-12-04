@@ -1,8 +1,8 @@
 #include<bits/stdc++.h>
-#include<fstream>
-#include<sstream>
-#include<chrono>
-#include<thread>
+#include<fstream>   // For file operations
+#include<sstream>  // For string stream operations
+#include<chrono>   // For timing functions
+#include<thread>    // For sleep functionality
 #ifdef _WIN32
 #include<windows.h>
 #endif
@@ -28,6 +28,7 @@ namespace Color {
         LIGHTMAGENTA = 13,
         YELLOW = 14,
         WHITE = 15,
+
         // Add these aliases for compatibility
         BRIGHT_BLUE = LIGHTBLUE,
         BRIGHT_WHITE = WHITE,
@@ -38,11 +39,12 @@ namespace Color {
         BRIGHT_MAGENTA = LIGHTMAGENTA
     };
     
-    void set(int color) {
-        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+    void set(int color)
+     {
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color); // Set text color
     }
     #else
-    enum {
+    enum { // ANSI color codes
         BLACK = 30,
         RED = 31,
         GREEN = 32,
@@ -66,7 +68,9 @@ namespace Color {
     }
     #endif
     
-    void reset() {
+    void reset() // Reset to default color
+    
+    {
         #ifdef _WIN32
         set(LIGHTGRAY);
         #else
@@ -76,7 +80,9 @@ namespace Color {
 }
 
 // GUI Helper functions
-void drawBox(int width, int height) {
+// Function to draw a box
+void drawBox(int width, int height)
+ {
     Color::set(Color::CYAN);
     cout << "\xC9"; // Top-left corner
     for(int i = 0; i < width-2; i++) cout << "\xCD"; // Horizontal line
@@ -94,13 +100,15 @@ void drawBox(int width, int height) {
     Color::reset();
 }
 
-void printCentered(const string& text, int width) {
-    int padding = (width - text.length()) / 2;
+void printCentered(const string& text, int width) // Helper function to print centered text
+{
+    int padding = (width - text.length()) / 2; // Calculate padding
     for(int i = 0; i < padding; i++) cout << " ";
     cout << text;
 }
 
-void printHeader(const string& title) {
+void printHeader(const string& title) 
+{
     int width = 80;
     Color::set(Color::BRIGHT_BLUE);
     cout << "\xC9";
@@ -146,7 +154,8 @@ void printInfo(const string& message) {
 }
 
 // Enhanced table printing functions with proper spacing
-void printTableHeader(const vector<string>& headers) {
+void printTableHeader(const vector<string>& headers)
+ {
     // Calculate column widths
     vector<int> widths;
     for (const auto& header : headers) {
@@ -218,7 +227,8 @@ void printTableRow(const vector<string>& cells) {
     Color::reset();
 }
 
-void printTableFooter() {
+void printTableFooter() 
+{
     // We'll use a fixed width for simplicity
     Color::set(Color::BRIGHT_CYAN);
     cout << "\xC0";
@@ -230,7 +240,8 @@ void printTableFooter() {
     Color::reset();
 }
 
-void clearScreen() {
+void clearScreen()
+ {
     #ifdef _WIN32
         system("cls");
     #else
@@ -238,7 +249,8 @@ void clearScreen() {
     #endif
 }
 
-void pauseScreen() {
+void pauseScreen()
+ {
     Color::set(Color::BRIGHT_MAGENTA);
     cout << "\nPress Enter to continue...";
     Color::reset();
@@ -247,7 +259,8 @@ void pauseScreen() {
 }
 
 // Enhanced loading bar with percentage and status
-void showLoadingBar(const string& message, int duration_ms = 1000) {
+void showLoadingBar(const string& message, int duration_ms = 1000)
+ {
     int width = 60;
     int barWidth = 40;
     
@@ -696,6 +709,11 @@ private:
     double nonAcPrice;
     string departureTime;
     string coachType; // "AC" or "Non-AC"
+    
+    // Delay tracking variables
+    string delayStatus;  // "On Time", "Delayed", or specific delay info
+    string delayReason;  // Reason for delay
+    int delayMinutes;    // Delay in minutes
 
 public:
     // Constructor
@@ -710,6 +728,11 @@ public:
         nonAcPrice = nonAc;
         departureTime = time;
         coachType = coach;
+        
+        // Initialize delay tracking
+        delayStatus = "On Time";
+        delayReason = "";
+        delayMinutes = 0;
     }
 
     // Getter methods
@@ -723,9 +746,16 @@ public:
     double getNonAcPrice() { return nonAcPrice; }
     string getDepartureTime() { return departureTime; }
     string getCoachType() { return coachType; }
+    string getDelayStatus() { return delayStatus; }
+    string getDelayReason() { return delayReason; }
+    int getDelayMinutes() { return delayMinutes; }
 
     // Setter methods
     void setAvailableSeats(int seats) { availableSeats = seats; }
+    void setDepartureTime(const string& time) { departureTime = time; }
+    void setDelayStatus(const string& status) { delayStatus = status; }
+    void setDelayReason(const string& reason) { delayReason = reason; }
+    void setDelayMinutes(int minutes) { delayMinutes = minutes; }
 
     // Method to display train details
     void displayTrainInfo() {
@@ -737,7 +767,8 @@ public:
             to_string(availableSeats),
             to_string(acPrice),
             to_string(nonAcPrice),
-            departureTime
+            departureTime,
+            delayStatus  // Add delay status to display
         };
         printTableRow(row);
     }
@@ -747,7 +778,8 @@ public:
         return to_string(trainNumber) + "," + trainName + "," + source + "," + 
                destination + "," + to_string(totalSeats) + "," + 
                to_string(availableSeats) + "," + to_string(acPrice) + "," + 
-               to_string(nonAcPrice) + "," + departureTime + "," + coachType;
+               to_string(nonAcPrice) + "," + departureTime + "," + coachType + "," +
+               delayStatus + "," + delayReason + "," + to_string(delayMinutes);
     }
 };
 
@@ -822,6 +854,8 @@ private:
     const string TICKET_FILE = "tickets.txt";
     const string DISTRICTS_FILE = "districts.txt";
     const string REFUND_LOG_FILE = "refund_log.txt";
+    const string TIME_CHANGE_LOG_FILE = "time_change_log.txt";
+    const string DELAY_LOG_FILE = "delay_log.txt";
 
     string getCurrentDate() {
         time_t now = time(0);
@@ -896,12 +930,20 @@ private:
                 }
                 
                 try {
-                    if (tokens.size() == 10) {
+                    if (tokens.size() >= 10) {
                         Train* train = new Train(
                             stoi(tokens[0]), tokens[1], tokens[2], tokens[3],
                             stoi(tokens[4]), stod(tokens[6]), stod(tokens[7]), tokens[8], tokens[9]
                         );
                         train->setAvailableSeats(stoi(tokens[5]));
+                        
+                        // Load delay information if available
+                        if (tokens.size() >= 13) {
+                            train->setDelayStatus(tokens[10]);
+                            train->setDelayReason(tokens[11]);
+                            train->setDelayMinutes(stoi(tokens[12]));
+                        }
+                        
                         trains.push_back(train);
                     }
                 } catch (const exception& e) {
@@ -1098,6 +1140,30 @@ private:
         }
     }
 
+    void logTimeChange(int trainNum, const string& oldTime, const string& newTime, const string& adminName) {
+        ofstream file(TIME_CHANGE_LOG_FILE, ios::app);
+        if (file.is_open()) {
+            file << "Date: " << getCurrentDate() 
+                 << " | Admin: " << adminName
+                 << " | Train: " << trainNum
+                 << " | Old Time: " << oldTime
+                 << " | New Time: " << newTime << endl;
+            file.close();
+        }
+    }
+
+    void logDelayChange(int trainNum, int delayMinutes, const string& reason, const string& adminName) {
+        ofstream file(DELAY_LOG_FILE, ios::app);
+        if (file.is_open()) {
+            file << "Date: " << getCurrentDate() 
+                 << " | Admin: " << adminName
+                 << " | Train: " << trainNum
+                 << " | Delay: " << delayMinutes << " minutes"
+                 << " | Reason: " << reason << endl;
+            file.close();
+        }
+    }
+
     bool isValidPhoneNumber(string phone) {
         // Check for Bangladeshi phone numbers
         if (phone.length() != 11) return false;
@@ -1120,6 +1186,44 @@ private:
         for (char c : phone) {
             if (!isdigit(c)) return false;
         }
+        
+        return true;
+    }
+
+    bool isValidTimeFormat(const string& time) {
+        // Check for basic format: HH:MM AM/PM
+        if (time.length() < 7) return false;
+        
+        size_t colonPos = time.find(':');
+        if (colonPos == string::npos) return false;
+        
+        string hourStr = time.substr(0, colonPos);
+        string minutePart = time.substr(colonPos + 1);
+        
+        // Check if hour is numeric
+        for (char c : hourStr) {
+            if (!isdigit(c)) return false;
+        }
+        
+        int hour = stoi(hourStr);
+        if (hour < 1 || hour > 12) return false;
+        
+        // Check minute part (should be like "30 AM" or "45 PM")
+        if (minutePart.length() < 4) return false;
+        
+        string minuteStr = minutePart.substr(0, 2);
+        string period = minutePart.substr(minutePart.length() - 2);
+        
+        // Check if minutes are numeric
+        for (char c : minuteStr) {
+            if (!isdigit(c)) return false;
+        }
+        
+        int minute = stoi(minuteStr);
+        if (minute < 0 || minute > 59) return false;
+        
+        // Check AM/PM
+        if (period != "AM" && period != "PM") return false;
         
         return true;
     }
@@ -1185,7 +1289,7 @@ private:
                 currentPage++;
                 startIdx = currentPage * itemsPerPage;
             } else if (choice >= 1 && choice <= (int)districts.size()) {
-                return choice - 1; // Return the index of selected station
+                return choice - 1; // Return index of selected station
             } else {
                 printError("Invalid choice! Please try again.");
                 this_thread::sleep_for(chrono::milliseconds(1000));
@@ -1315,6 +1419,59 @@ public:
         pauseScreen();
     }
 
+    void adminRegistration() {
+        clearScreen();
+        printHeader("ADMIN REGISTRATION");
+        
+        string username, password, phone, adminKey;
+        Color::set(Color::WHITE);
+        cout << "Enter Admin Username: ";
+        Color::reset();
+        cin >> username;
+        
+        Color::set(Color::WHITE);
+        cout << "Enter Admin Password: ";
+        Color::reset();
+        cin >> password;
+        
+        Color::set(Color::WHITE);
+        cout << "Enter Phone Number (11 digits): ";
+        Color::reset();
+        cin >> phone;
+        
+        // Optional: Require a secret admin key for security
+        Color::set(Color::WHITE);
+        cout << "Enter Admin Security Key: ";
+        Color::reset();
+        cin >> adminKey;
+        
+        if (adminKey != "SECRET123") {   // Replace with your own secure key
+            printError("Invalid Admin Security Key! Access denied.");
+            pauseScreen();
+            return;
+        }
+        
+        if (!isValidPhoneNumber(phone)) {
+            printError("Invalid phone number! Please use 11-digit Bangladeshi format (01XXXXXXXXX).");
+            pauseScreen();
+            return;
+        }
+        
+        if (findUserByUsername(username) != nullptr) {
+            printError("Username already exists!");
+            pauseScreen();
+            return;
+        }
+        
+        // Show loading animation
+        showLoadingBar("Creating new admin account...", 800);
+        
+        admins.push_back(new User(username, password, phone, "admin"));
+        saveAdminsToFile();
+        printSuccess("Admin Registration Successful! You can now login as admin.");
+        pauseScreen();
+    }
+
     void adminResetPassword() {
         clearScreen();
         printHeader("ADMIN PASSWORD RESET");
@@ -1352,10 +1509,11 @@ public:
             
             cout << "\n";
             printMenuItem(1, "Admin Login");
-            printMenuItem(2, "User Login");
-            printMenuItem(3, "User Registration");
-            printMenuItem(4, "Guest Mode");
-            printMenuItem(5, "Exit");
+            printMenuItem(2, "Admin Registration");
+            printMenuItem(3, "User Login");
+            printMenuItem(4, "User Registration");
+            printMenuItem(5, "Guest Mode");
+            printMenuItem(6, "Exit");
             
             Color::set(Color::BRIGHT_BLUE);
             cout << "\n========================================\n";
@@ -1373,17 +1531,20 @@ public:
                     }
                     break;
                 case 2:
+                    adminRegistration();
+                    break;
+                case 3:
                     if (userLogin()) {
                         userMenu();
                     }
                     break;
-                case 3:
+                case 4:
                     userRegistration();
                     break;
-                case 4:
+                case 5:
                     userGuestMode();
                     break;
-                case 5:
+                case 6:
                     printSuccess("Thank you for using Train Management System!");
                     return;
                 default:
@@ -1439,10 +1600,13 @@ public:
             printMenuItem(1, "Manage Train Function");
             printMenuItem(2, "View All Trains");
             printMenuItem(3, "Show Train Schedule");
-            printMenuItem(4, "Reset User Password");
-            printMenuItem(5, "View All Tickets");
-            printMenuItem(6, "View Refund Logs");
-            printMenuItem(7, "Back to Main Menu");
+            printMenuItem(4, "Manage Train Delays");
+            printMenuItem(5, "Reset User Password");
+            printMenuItem(6, "View All Tickets");
+            printMenuItem(7, "View Refund Logs");
+            printMenuItem(8, "View Time Change Logs");
+            printMenuItem(9, "View Delay Logs");
+            printMenuItem(10, "Back to Main Menu");
             
             Color::set(Color::BRIGHT_BLUE);
             cout << "\n========================================\n";
@@ -1466,17 +1630,28 @@ public:
                     pauseScreen();
                     break;
                 case 4:
-                    adminResetPassword();
+                    manageTrainDelays();
                     break;
                 case 5:
+                    adminResetPassword();
+                    break;
+                case 6:
                     viewAllTickets();
                     pauseScreen();
                     break;
-                case 6:
+                case 7:
                     viewRefundLogs();
                     pauseScreen();
                     break;
-                case 7:
+                case 8:
+                    viewTimeChangeLogs();
+                    pauseScreen();
+                    break;
+                case 9:
+                    viewDelayLogs();
+                    pauseScreen();
+                    break;
+                case 10:
                     currentUser = nullptr;
                     return;
                 default:
@@ -1656,7 +1831,7 @@ public:
         Color::reset();
         cin >> trainNum;
         
-        // Check if the train has any active tickets
+        // Check if train has any active tickets
         for (size_t i = 0; i < tickets.size(); i++) {
             if (tickets[i]->getTrainNumber() == trainNum && !tickets[i]->getIsCancelled()) {
                 printError("Cannot delete train with active tickets!");
@@ -1690,7 +1865,7 @@ public:
             return;
         }
         
-        vector<string> headers = {"Train No", "Train Name", "Source", "Destination", "Seats", "AC Price", "Non-AC", "Time"};
+        vector<string> headers = {"Train No", "Train Name", "Source", "Destination", "Seats", "AC Price", "Non-AC", "Time", "Status"};
         printTableHeader(headers);
         
         for (size_t i = 0; i < trains.size(); i++) {
@@ -1739,7 +1914,7 @@ public:
             Color::reset();
             cout << endl;
             
-            vector<string> headers = {"Train No", "Train Name", "Source", "Destination", "Seats", "AC Price", "Non-AC", "Time"};
+            vector<string> headers = {"Train No", "Train Name", "Source", "Destination", "Seats", "AC Price", "Non-AC", "Time", "Status"};
             printTableHeader(headers);
             
             for (size_t i = 0; i < foundTrains.size(); i++) {
@@ -1765,7 +1940,7 @@ public:
                 Color::reset();
                 cout << endl;
                 
-                vector<string> headers = {"Train No", "Train Name", "Source", "Destination", "Seats", "AC Price", "Non-AC", "Time"};
+                vector<string> headers = {"Train No", "Train Name", "Source", "Destination", "Seats", "AC Price", "Non-AC", "Time", "Status"};
                 printTableHeader(headers);
                 
                 for (size_t i = 0; i < alternativeTrains.size(); i++) {
@@ -1934,13 +2109,22 @@ public:
         for (size_t i = 0; i < tickets.size(); i++) {
             if (tickets[i]->getPassengerPhone() == currentUser->getPhoneNumber() && !tickets[i]->getIsCancelled()) {
                 if (!found) {
-                    vector<string> headers = {"Ticket ID", "Train No", "Passenger", "Coach", "Seats", "Amount", "Date"};
+                    vector<string> headers = {"Ticket ID", "Train No", "Passenger", "Coach", "Seats", "Amount", "Date", "Status"};
                     printTableHeader(headers);
                     found = true;
                 }
                 
                 Train* train = findTrainByNumber(tickets[i]->getTrainNumber());
                 string trainName = (train != nullptr) ? train->getTrainName() : "Unknown";
+                string delayInfo = "";
+                
+                if (train != nullptr) {
+                    if (train->getDelayStatus() == "Delayed") {
+                        delayInfo = "DELAYED " + to_string(train->getDelayMinutes()) + " mins";
+                    } else {
+                        delayInfo = "ON TIME";
+                    }
+                }
                 
                 vector<string> row = {
                     to_string(tickets[i]->getTicketId()),
@@ -1949,9 +2133,17 @@ public:
                     tickets[i]->getCoachType(),
                     to_string(tickets[i]->getNumberOfSeats()),
                     to_string(tickets[i]->getTotalAmount()),
-                    tickets[i]->getBookingDate()
+                    tickets[i]->getBookingDate(),
+                    delayInfo  // Show delay status
                 };
                 printTableRow(row);
+                
+                // Show detailed delay information if delayed
+                if (train != nullptr && train->getDelayStatus() == "Delayed") {
+                    Color::set(Color::BRIGHT_RED);
+                    cout << "  -> Delay Reason: " << train->getDelayReason() << endl;
+                    Color::reset();
+                }
             }
         }
         
@@ -2130,6 +2322,423 @@ public:
             Color::reset();
         }
         file.close();
+    }
+
+    // View time change logs
+    void viewTimeChangeLogs() {
+        clearScreen();
+        printHeader("TIME CHANGE LOGS");
+        
+        // Check if user is an admin
+        if (currentUser == nullptr || currentUser->getRole() != "admin") {
+            printError("Access denied! Admin privileges required.");
+            pauseScreen();
+            return;
+        }
+        
+        ifstream file(TIME_CHANGE_LOG_FILE);
+        if (!file.is_open()) {
+            printInfo("No time change logs found!");
+            return;
+        }
+        
+        string line;
+        Color::set(Color::BRIGHT_YELLOW);
+        cout << "Recent time changes:\n\n";
+        Color::reset();
+        
+        while (getline(file, line)) {
+            Color::set(Color::WHITE);
+            cout << line << endl;
+            Color::reset();
+        }
+        file.close();
+    }
+
+    // View delay logs
+    void viewDelayLogs() {
+        clearScreen();
+        printHeader("DELAY LOGS");
+        
+        // Check if user is an admin
+        if (currentUser == nullptr || currentUser->getRole() != "admin") {
+            printError("Access denied! Admin privileges required.");
+            pauseScreen();
+            return;
+        }
+        
+        ifstream file(DELAY_LOG_FILE);
+        if (!file.is_open()) {
+            printInfo("No delay logs found!");
+            return;
+        }
+        
+        string line;
+        Color::set(Color::BRIGHT_YELLOW);
+        cout << "Recent delay changes:\n\n";
+        Color::reset();
+        
+        while (getline(file, line)) {
+            Color::set(Color::WHITE);
+            cout << line << endl;
+            Color::reset();
+        }
+        file.close();
+    }
+
+    // Show trains with active tickets
+    void showTrainsWithTickets() {
+        clearScreen();
+        printHeader("TRAINS WITH ACTIVE TICKETS");
+        
+        if (tickets.empty()) {
+            printInfo("No tickets found in system!");
+            pauseScreen();
+            return;
+        }
+        
+        // Create a set to avoid duplicate trains
+        set<int> trainNumbers;
+        vector<Train*> activeTrains;
+        
+        // Find all trains with active tickets
+        for (size_t i = 0; i < tickets.size(); i++) {
+            if (!tickets[i]->getIsCancelled()) {
+                int trainNum = tickets[i]->getTrainNumber();
+                if (trainNumbers.find(trainNum) == trainNumbers.end()) {
+                    trainNumbers.insert(trainNum);
+                    Train* train = findTrainByNumber(trainNum);
+                    if (train != nullptr) {
+                        activeTrains.push_back(train);
+                    }
+                }
+            }
+        }
+        
+        if (activeTrains.empty()) {
+            printInfo("No trains with active tickets found!");
+            pauseScreen();
+            return;
+        }
+        
+        Color::set(Color::BRIGHT_GREEN);
+        cout << "Found " << activeTrains.size() << " trains with active tickets:" << endl;
+        Color::reset();
+        cout << endl;
+        
+        vector<string> headers = {"Train No", "Train Name", "Source", "Destination", "Current Time", "Seats", "Status"};
+        printTableHeader(headers);
+        
+        for (size_t i = 0; i < activeTrains.size(); i++) {
+            string statusInfo = activeTrains[i]->getDelayStatus();
+            if (activeTrains[i]->getDelayStatus() == "Delayed") {
+                statusInfo += " (" + to_string(activeTrains[i]->getDelayMinutes()) + " mins)";
+            }
+            
+            vector<string> row = {
+                to_string(activeTrains[i]->getTrainNumber()),
+                activeTrains[i]->getTrainName(),
+                activeTrains[i]->getSource(),
+                activeTrains[i]->getDestination(),
+                activeTrains[i]->getDepartureTime(),
+                to_string(activeTrains[i]->getAvailableSeats()),
+                statusInfo  // Show delay status
+            };
+            printTableRow(row);
+        }
+        
+        printTableFooter();
+    }
+
+    // Update train departure time
+    void updateTrainTime() {
+        clearScreen();
+        printHeader("UPDATE TRAIN DEPARTURE TIME");
+        
+        // First show trains with active tickets
+        showTrainsWithTickets();
+        
+        if (trains.empty()) return;
+        
+        int trainNum;
+        Color::set(Color::WHITE);
+        cout << "\nEnter Train Number to update time: ";
+        Color::reset();
+        cin >> trainNum;
+        
+        Train* train = findTrainByNumber(trainNum);
+        if (train == nullptr) {
+            printError("Train not found!");
+            pauseScreen();
+            return;
+        }
+        
+        // Check if train has active tickets
+        bool hasActiveTickets = false;
+        for (size_t i = 0; i < tickets.size(); i++) {
+            if (tickets[i]->getTrainNumber() == trainNum && !tickets[i]->getIsCancelled()) {
+                hasActiveTickets = true;
+                break;
+            }
+        }
+        
+        if (!hasActiveTickets) {
+            printError("This train has no active tickets. Cannot update time.");
+            pauseScreen();
+            return;
+        }
+        
+        // Display current time
+        Color::set(Color::BRIGHT_YELLOW);
+        cout << "\nCurrent departure time: " << train->getDepartureTime() << endl;
+        Color::reset();
+        
+        string newTime;
+        Color::set(Color::WHITE);
+        cout << "Enter new departure time (e.g., 10:30 AM, 02:45 PM): ";
+        Color::reset();
+        cin.ignore();
+        getline(cin, newTime);
+        
+        // Validate time format
+        if (!isValidTimeFormat(newTime)) {
+            printError("Invalid time format! Please use format like '10:30 AM' or '02:45 PM'");
+            pauseScreen();
+            return;
+        }
+        
+        // Show confirmation
+        Color::set(Color::BRIGHT_CYAN);
+        cout << "\n========================================\n";
+        Color::set(Color::WHITE);
+        cout << "Train: " << train->getTrainName() << " (" << trainNum << ")\n";
+        cout << "Route: " << train->getSource() << " to " << train->getDestination() << "\n";
+        cout << "Old Time: " << train->getDepartureTime() << "\n";
+        cout << "New Time: " << newTime << "\n";
+        Color::set(Color::BRIGHT_CYAN);
+        cout << "========================================\n";
+        Color::reset();
+        
+        Color::set(Color::BRIGHT_YELLOW);
+        cout << "\nThis will notify all passengers with tickets for this train.\n";
+        cout << "Are you sure you want to update the departure time? (y/n): ";
+        Color::reset();
+        
+        char confirm;
+        cin >> confirm;
+        
+        if (confirm == 'y' || confirm == 'Y') {
+            // Show loading animation
+            showLoadingBar("Updating train departure time...", 1000);
+            
+            // Store old time for logging
+            string oldTime = train->getDepartureTime();
+            
+            // Update train time
+            train->setDepartureTime(newTime);
+            
+            // Save to file
+            saveTrainsToFile();
+            
+            // Log the change
+            logTimeChange(trainNum, oldTime, newTime, currentUser->getUsername());
+            
+            printSuccess("Train departure time updated successfully!");
+            printInfo("All passengers will be notified of the change.");
+            
+            // Show affected passengers
+            showAffectedPassengers(trainNum);
+        } else {
+            printInfo("Operation cancelled.");
+        }
+        
+        pauseScreen();
+    }
+
+    // Set train delay
+    void setTrainDelay() {
+        clearScreen();
+        printHeader("SET TRAIN DELAY");
+        
+        // Show trains with active tickets
+        showTrainsWithTickets();
+        
+        int trainNum;
+        Color::set(Color::WHITE);
+        cout << "\nEnter Train Number to set delay: ";
+        Color::reset();
+        cin >> trainNum;
+        
+        Train* train = findTrainByNumber(trainNum);
+        if (train == nullptr) {
+            printError("Train not found!");
+            pauseScreen();
+            return;
+        }
+        
+        // Check if train has active tickets
+        bool hasActiveTickets = false;
+        for (size_t i = 0; i < tickets.size(); i++) {
+            if (tickets[i]->getTrainNumber() == trainNum && !tickets[i]->getIsCancelled()) {
+                hasActiveTickets = true;
+                break;
+            }
+        }
+        
+        if (!hasActiveTickets) {
+            printError("This train has no active tickets. Cannot set delay.");
+            pauseScreen();
+            return;
+        }
+        
+        // Display current status
+        Color::set(Color::BRIGHT_YELLOW);
+        cout << "\nCurrent Status: " << train->getDelayStatus() << endl;
+        cout << "Current Departure Time: " << train->getDepartureTime() << endl;
+        Color::reset();
+        
+        int delayMinutes;
+        string delayReason;
+        
+        Color::set(Color::WHITE);
+        cout << "\nEnter delay in minutes (0 to remove delay): ";
+        Color::reset();
+        cin >> delayMinutes;
+        
+        cin.ignore();
+        Color::set(Color::WHITE);
+        cout << "Enter delay reason: ";
+        Color::reset();
+        getline(cin, delayReason);
+        
+        // Show confirmation
+        Color::set(Color::BRIGHT_CYAN);
+        cout << "\n========================================\n";
+        Color::set(Color::WHITE);
+        cout << "Train: " << train->getTrainName() << " (" << trainNum << ")\n";
+        cout << "Route: " << train->getSource() << " to " << train->getDestination() << "\n";
+        cout << "Delay: " << delayMinutes << " minutes\n";
+        cout << "Reason: " << delayReason << "\n";
+        Color::set(Color::BRIGHT_CYAN);
+        cout << "========================================\n";
+        Color::reset();
+        
+        Color::set(Color::BRIGHT_YELLOW);
+        cout << "\nThis will notify all passengers with tickets for this train.\n";
+        cout << "Are you sure you want to set this delay? (y/n): ";
+        Color::reset();
+        
+        char confirm;
+        cin >> confirm;
+        
+        if (confirm == 'y' || confirm == 'Y') {
+            // Show loading animation
+            showLoadingBar("Setting train delay...", 1000);
+            
+            // Update delay information
+            if (delayMinutes > 0) {
+                train->setDelayStatus("Delayed");
+                train->setDelayMinutes(delayMinutes);
+                train->setDelayReason(delayReason);
+            } else {
+                train->setDelayStatus("On Time");
+                train->setDelayMinutes(0);
+                train->setDelayReason("");
+            }
+            
+            // Save to file
+            saveTrainsToFile();
+            
+            // Log the change
+            logDelayChange(trainNum, delayMinutes, delayReason, currentUser->getUsername());
+            
+            printSuccess("Train delay information updated successfully!");
+            printInfo("All passengers will be notified of the delay.");
+            
+            // Show affected passengers
+            showAffectedPassengers(trainNum);
+        } else {
+            printInfo("Operation cancelled.");
+        }
+        
+        pauseScreen();
+    }
+
+    // Show affected passengers
+    void showAffectedPassengers(int trainNum) {
+        cout << endl;
+        Color::set(Color::BRIGHT_YELLOW);
+        cout << "Affected Passengers:\n";
+        Color::reset();
+        
+        vector<string> headers = {"Ticket ID", "Passenger", "Phone", "Seats", "Booking Date"};
+        printTableHeader(headers);
+        
+        int affectedCount = 0;
+        for (size_t i = 0; i < tickets.size(); i++) {
+            if (tickets[i]->getTrainNumber() == trainNum && !tickets[i]->getIsCancelled()) {
+                vector<string> row = {
+                    to_string(tickets[i]->getTicketId()),
+                    tickets[i]->getPassengerName(),
+                    tickets[i]->getPassengerPhone(),
+                    to_string(tickets[i]->getNumberOfSeats()),
+                    tickets[i]->getBookingDate()
+                };
+                printTableRow(row);
+                affectedCount++;
+            }
+        }
+        
+        printTableFooter();
+        
+        Color::set(Color::BRIGHT_GREEN);
+        cout << "\nTotal affected passengers: " << affectedCount << endl;
+        Color::reset();
+    }
+
+    // Manage Train Delays
+    void manageTrainDelays() {
+        while (true) {
+            clearScreen();
+            printHeader("MANAGE TRAIN DELAYS");
+            
+            printMenuItem(1, "View Trains with Active Tickets");
+            printMenuItem(2, "Set Train Delay");
+            printMenuItem(3, "Update Train Departure Time");
+            printMenuItem(4, "View Delay Logs");
+            printMenuItem(5, "Back to Admin Menu");
+            
+            Color::set(Color::BRIGHT_BLUE);
+            cout << "\n========================================\n";
+            Color::set(Color::WHITE);
+            cout << "Enter your choice: ";
+            Color::reset();
+            
+            int choice;
+            cin >> choice;
+            
+            switch (choice) {
+                case 1:
+                    showTrainsWithTickets();
+                    pauseScreen();
+                    break;
+                case 2:
+                    setTrainDelay();
+                    break;
+                case 3:
+                    updateTrainTime();
+                    break;
+                case 4:
+                    viewDelayLogs();
+                    pauseScreen();
+                    break;
+                case 5:
+                    return;
+                default:
+                    printError("Invalid choice! Please try again.");
+                    pauseScreen();
+            }
+        }
     }
 };
 
